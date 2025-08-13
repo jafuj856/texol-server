@@ -37,8 +37,13 @@ export const getAllProducts = asyncHandler(async (req, res) => {
 
 export const addProduct = asyncHandler(async (req, res) => {
   const { name, price, category, stock, description } = req.body;
+  console.log(req.files, "[[[");
 
-  const images = req.files.map((file) => file.filename);
+  if (req.files && req.files.length === 0) {
+    throw new Error("images is required");
+  }
+  const images =
+    req?.files?.length > 0 ? req?.files?.map((file) => file.filename) : [];
   if (!name || !description || !price || !category || !stock || !images) {
     res.status(400);
     throw new Error("Please fill all fields");
@@ -55,5 +60,32 @@ export const addProduct = asyncHandler(async (req, res) => {
   } catch (error) {
     res.status(500);
     throw new Error("Server error: " + error.message);
+  }
+});
+
+// update section
+
+export const updateProductById = asyncHandler(async (req, res) => {
+  const { id, name, description, price, stock } = req.body;
+  if (!id) {
+    return res.status(400).message("please provide product id");
+  }
+  try {
+    const product = await Product.findById(id);
+    if (!product) {
+      return res.status(401).message("product not found");
+    }
+    if (req.files && req.files?.length > 0) {
+      product.images = req.files.map((file) => file.filename);
+    }
+    if (name) product.name = name;
+    if (price) product.price = price;
+    if (description) product.description = description;
+    if (stock) product.stock = stock;
+    const updateProduct = await product.save();
+    res.status(200).json(updateProduct);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).message({ message: err.message });
   }
 });

@@ -14,7 +14,7 @@ const storage = multer.diskStorage({
   },
 });
 
-// File filter (only images)
+// File filter
 const fileFilter = (req, file, cb) => {
   const allowedTypes = /jpeg|jpg|png|webp/;
   const extname = allowedTypes.test(
@@ -23,9 +23,9 @@ const fileFilter = (req, file, cb) => {
   const mimetype = allowedTypes.test(file.mimetype);
 
   if (mimetype && extname) {
-    return cb(null, true);
+    cb(null, true);
   } else {
-    cb("Error: Only images are allowed!");
+    cb(new Error("Only images (jpeg, jpg, png, webp) are allowed!"), false);
   }
 };
 

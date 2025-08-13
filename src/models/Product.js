@@ -33,18 +33,7 @@ const productSchema = mongoose.Schema({
     trim: true,
     maxlength: [500, "Product description cannot exceed 500 characters"],
   },
-  images: [
-    {
-      public_id: {
-        type: String,
-        required: true,
-      },
-      url: {
-        type: String,
-        required: true,
-      },
-    },
-  ],
+  images: [String],
 });
 
 export default mongoose.model("Product", productSchema);
