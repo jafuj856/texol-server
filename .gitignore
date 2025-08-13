@@ -1,0 +1,30 @@
+# Node modules
+node_modules/
+
+# Environment variables
+# .env
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Optional: Uploaded files (if not using cloud storage)
+uploads/
+
+# Build outputs
+dist/
+build/
+
+# IDE files
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.swp
