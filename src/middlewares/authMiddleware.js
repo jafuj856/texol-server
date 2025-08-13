@@ -3,7 +3,7 @@ import User from "../models/User.js";
 import dotenv from "dotenv";
 
 dotenv.config();
-export const authCheking = async (req, res, next) => {
+export const authChecking = async (req, res, next) => {
   let token;
   if (
     req.headers.authorization &&

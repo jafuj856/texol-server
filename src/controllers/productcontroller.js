@@ -68,12 +68,14 @@ export const addProduct = asyncHandler(async (req, res) => {
 export const updateProductById = asyncHandler(async (req, res) => {
   const { id, name, description, price, stock } = req.body;
   if (!id) {
-    return res.status(400).message("please provide product id");
+    res.status(400);
+    throw new Error("please provide product id");
   }
   try {
     const product = await Product.findById(id);
     if (!product) {
-      return res.status(401).message("product not found");
+      res.status(401);
+      throw new Error("product not found");
     }
     if (req.files && req.files?.length > 0) {
       product.images = req.files.map((file) => file.filename);
@@ -86,6 +88,38 @@ export const updateProductById = asyncHandler(async (req, res) => {
     res.status(200).json(updateProduct);
   } catch (err) {
     console.log(err);
-    return res.status(500).message({ message: err.message });
+    res.status(500);
+    throw new Error(err.message);
+  }
+});
+
+export const deleteProduct = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  if (!id) {
+    res.status(400);
+    throw new Error("please provide product id");
+  }
+
+  try {
+    const product = await findById(id);
+    if (!product) {
+      res.status(401);
+      throw new Error("product not found");
+    }
+    if (product.images && product?.images?.length > 0) {
+      product?.images?.array.forEach((element) => {
+        const imagePath = Path.join("uploads", image);
+        fs.unlink(imagePath, (err) => {
+          if (err) {
+            console.error(`Error deleting image ${image}:`, err.message);
+          }
+        });
+      });
+    }
+    await product.deleteOne();
+    res.status(200).message("product deleted success fully");
+  } catch (err) {
+    res.status(500);
+    throw new Error(err.message);
   }
 });
