@@ -3,15 +3,17 @@ import asyncHandler from "express-async-handler";
 
 // get All products
 export const getAllProducts = asyncHandler(async (req, res) => {
+  console.log(req);
+
   const { search, category, minPrice, maxPrice } = req.query;
   let query = {};
   if (search) {
     query.$or = [
       { name: { $regex: search, $options: "i" } },
       { description: { $regex: search, $options: "i" } },
-    ]; // case-insensitive search
+    ];
   }
-  //   category
+
   if (category) {
     query.category = category;
   }

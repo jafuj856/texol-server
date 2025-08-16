@@ -22,7 +22,7 @@ router.post(
   upload.array("images", 5),
   addProduct
 ); // Assuming addProduct is defined in the controller
-router.post("/updateById", authChecking, updateProductById);
-router.delete("/:id", authChecking, deleteProduct);
+router.put("/updateById", authChecking, isAdmin, updateProductById);
+router.delete("/:id", authChecking, isAdmin, deleteProduct);
 //isAdmin
 export default router;
