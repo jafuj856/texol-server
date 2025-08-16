@@ -51,12 +51,12 @@ app.set("io", io);
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/api/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/order", orderRoutes);
-app.use("/cart", cartRoutes);
+app.use("/api/cart", cartRoutes);
 
 // errorHandler
 app.use(errorHandler);

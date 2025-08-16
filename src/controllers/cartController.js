@@ -26,40 +26,94 @@ export const productAddToCart = asyncHandler(async (req, res) => {
         name: product.name,
         qty,
         price: product.price,
+        image: product.images?.[0] || "",
       });
     }
-
     await cart.save();
     res.status(201).json(cart);
-  } catch (error) {}
+  } catch (error) {
+    res.status(500);
+    throw new Error(error?.message);
+  }
 });
 
-export const removeFromCart = asyncHandler(async (req, res) => {
-  const cart = await Cart.findOne({ user: req.user._id });
+export const updateCartItemQty = asyncHandler(async (req, res) => {
+  const { productId } = req.body;
+  const { action } = req.body;
 
-  if (!cart) {
-    res.status(404);
-    throw new Error("Cart not found");
+  if (!["increase", "decrease"].includes(action)) {
+    return res.status(400).json({ message: "Invalid action" });
   }
 
-  cart.cartItems = cart.cartItems.filter(
-    (item) => item.product.toString() !== req.params.productId
+  const cart = await Cart.findOne({ user: req.user._id });
+  if (!cart) {
+    return res.status(404).json({ message: "Cart not found" });
+  }
+
+  const itemIndex = cart.cartItems.findIndex(
+    (item) => item.product.toString() === productId
   );
+
+  if (itemIndex === -1) {
+    return res.status(404).json({ message: "Product not found in cart" });
+  }
+
+  let currentQty = Number(cart.cartItems[itemIndex].qty) || 1;
+
+  if (action === "increase") {
+    currentQty += 1;
+  } else if (action === "decrease") {
+    currentQty -= 1;
+  }
+
+  if (currentQty <= 0) {
+    cart.cartItems.splice(itemIndex, 1);
+  } else {
+    cart.cartItems[itemIndex].qty = currentQty;
+    if (!cart.cartItems[itemIndex].image) {
+      cart.cartItems[itemIndex].image = "";
+    }
+  }
+  const totalQty = cart.cartItems.reduce((acc, item) => acc + item.qty, 0);
+  const totalPrice = cart.cartItems.reduce(
+    (acc, item) => acc + item.qty * item.price,
+    0
+  );
+  // console.log(cart);
+
   await cart.save();
-  res.json(cart);
+
+  res.status(200).json({
+    cartItems: cart.cartItems,
+    totalQty,
+    totalPrice,
+  });
 });
 
 export const getCart = asyncHandler(async (req, res) => {
   try {
-    const cart = await Cart.find();
+    const cart = await Cart.findOne({ user: req.user._id });
 
-    if (!cart || cart.length === 0) {
-      return res.status(200).json([]);
+    if (!cart) {
+      return res.status(200).json({
+        cartItems: [],
+        totalQty: 0,
+        totalPrice: 0,
+      });
     }
+    const totalQty = cart.cartItems.reduce((acc, item) => acc + item.qty, 0);
+    const totalPrice = cart.cartItems.reduce(
+      (acc, item) => acc + item.qty * item.price,
+      0
+    );
 
-    res.status(200).json(cart);
-  } catch (err) {
-    res.status(500);
-    throw new Error(err.message);
+    res.status(200).json({
+      cartItems: cart.cartItems,
+      totalQty,
+      totalPrice,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
   }
 });

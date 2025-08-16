@@ -17,12 +17,18 @@ router.get("/", getAllProducts);
 router.post(
   "/",
   authChecking,
+  upload.array("images", 5),
   validateProduct,
   handleValidation,
-  upload.array("images", 5),
   addProduct
-); // Assuming addProduct is defined in the controller
-router.put("/updateById", authChecking, isAdmin, updateProductById);
+);
+router.put(
+  "/updateById",
+  authChecking,
+  isAdmin,
+  upload.array("images", 5),
+  updateProductById
+);
 router.delete("/:id", authChecking, isAdmin, deleteProduct);
 //isAdmin
 export default router;

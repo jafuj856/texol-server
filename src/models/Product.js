@@ -23,7 +23,7 @@ const productSchema = mongoose.Schema({
   stock: {
     type: Number,
     required: [true, "Please enter product stock"],
-    default: 0,
+    // default: 0,
     maxlength: [5, "Product stock cannot exceed 5 digits"],
     min: [0, "Stock cannot be negative"],
   },
